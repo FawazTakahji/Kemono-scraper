@@ -483,14 +483,16 @@ func main() {
 
 	if k {
 		terminal.Print("Downloading Kemono")
-		err := KKemono.Start()
+		kemonoHost := siteHost(Kemono)
+		err := KKemono.Start(kemonoHost)
 		if err != nil {
 			log.Printf("kemono start failed: %s", err)
 		}
 	}
 	if c {
 		terminal.Print("Downloading Coomer")
-		err := KCoomer.Start()
+		coomerHost := siteHost(Coomer)
+		err := KCoomer.Start(coomerHost)
 		if err != nil {
 			log.Printf("coomer start failed: %s", err)
 		}
