@@ -40,12 +40,16 @@ var (
 	s, srv, userId, postId string
 	// map[<Creator>][]<postId>
 	idFilter map[string]map[kemono.Creator][]string
+	userPostPair map[string]map[string][]string
 )
 
 func init() {
 	idFilter = make(map[string]map[kemono.Creator][]string)
 	idFilter[Kemono] = make(map[kemono.Creator][]string)
 	idFilter[Coomer] = make(map[kemono.Creator][]string)
+	userPostPair = make(map[string]map[string][]string)
+	userPostPair[Kemono] = make(map[string][]string)
+	userPostPair[Coomer] = make(map[string][]string)
 	options = make(map[string][]kemono.Option)
 }
 
@@ -93,6 +97,9 @@ func main() {
 			users[s] = append(users[s], srv, userId)
 			if postId != "" {
 				idFilter[s][cs] = append(idFilter[s][cs], postId)
+
+				creatorKey := fmt.Sprintf("%s:%s", srv, userId)
+				userPostPair[s][creatorKey] = append(userPostPair[s][creatorKey], postId)
 			}
 			options[s] = append(options[s],
 				kemono.WithUsersPair(users[s]...),
@@ -154,6 +161,12 @@ func main() {
 					kemono.IdFilter(ids...),
 				))
 			}
+		}
+	}
+
+	for k, v := range userPostPair {
+		if len(v) > 0 {
+			options[k] = append(options[k], kemono.WithUserPostPairs(v))
 		}
 	}
 

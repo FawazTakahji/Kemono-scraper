@@ -71,6 +71,8 @@ type Kemono struct {
 	retry int
 
 	retryInterval time.Duration
+
+	userPostPairs map[string][]string
 }
 
 func NewKemono(options ...Option) *Kemono {
@@ -105,6 +107,12 @@ func WithDomain(web string) Option {
 func WithBanner(banner bool) Option {
 	return func(k *Kemono) {
 		k.Banner = banner
+	}
+}
+
+func WithUserPostPairs(pair map[string][]string) Option  {
+	return func(k *Kemono) {
+		k.userPostPairs = pair
 	}
 }
 

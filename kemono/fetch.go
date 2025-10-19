@@ -40,6 +40,9 @@ func (k *Kemono) FetchCreators(host string) (creators []Creator, err error) {
 
 // FetchPosts fetch post list
 func (k *Kemono) FetchPosts(service, id string, host string) (posts []Post, err error) {
+	key := fmt.Sprintf("%s:%s", service, id)
+	postPairs := k.userPostPairs[key]
+
         url := fmt.Sprintf("https://%s/api/v1/%s/user/%s/posts", host, service, id)
         perUnit := 50
         fetch := func(page int, max_num_posts int) (err error, finish bool) {
@@ -87,11 +90,24 @@ func (k *Kemono) FetchPosts(service, id string, host string) (posts []Post, err 
 		        }
 		        for _, p := range pr {
 			        posts = append(posts, p.ParasTime())
+
+					if postPairs != nil {
+						for i, id := range postPairs {
+							if p.Id == id {
+								postPairs = append(postPairs[:i], postPairs[i+1:]...)
+								break
+							}
+						}
+					}
 		        }
 		        if len(pr) == 0 || max_num_posts <= (page+1)*perUnit {
 			        // final page
 			        return nil, true
 		        }
+				if postPairs != nil && len(postPairs) < 1 {
+					k.log.Printf("Stopped fetching pages at %d because all the posts have been fetched", page)
+					return nil, true
+				}
 		        return nil, false
 	        }
 
